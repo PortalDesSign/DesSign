@@ -278,7 +278,27 @@ class Front_End {
 	 */
 	public function enqueue_scripts() {
 		$this->add_styles();
+		$this->add_inline_styles();
 		$this->add_scripts();
+	}
+
+	/**
+	 * Enqueue inline styles for core components.
+	 */
+	private function add_inline_styles() {
+
+		// Add Inline styles if buttons shadows are being used.
+		$primary_values   = get_theme_mod( Config::MODS_BUTTON_PRIMARY_STYLE, neve_get_button_appearance_default() );
+		$secondary_values = get_theme_mod( Config::MODS_BUTTON_SECONDARY_STYLE, neve_get_button_appearance_default( 'secondary' ) );
+
+		if (
+			( isset( $primary_values['useShadow'] ) && ! empty( $primary_values['useShadow'] ) ) ||
+			( isset( $primary_values['useShadowHover'] ) && ! empty( $primary_values['useShadowHover'] ) ) ||
+			( isset( $secondary_values['useShadow'] ) && ! empty( $secondary_values['useShadow'] ) ) ||
+			( isset( $secondary_values['useShadowHover'] ) && ! empty( $secondary_values['useShadowHover'] ) )
+		) {
+			wp_add_inline_style( 'neve-style', '.button.button-primary, .is-style-primary .wp-block-button__link {box-shadow: var(--primarybtnshadow, none);} .button.button-primary:hover, .is-style-primary .wp-block-button__link:hover {box-shadow: var(--primarybtnhovershadow, none);} .button.button-secondary, .is-style-secondary .wp-block-button__link {box-shadow: var(--secondarybtnshadow, none);} .button.button-secondary:hover, .is-style-secondary .wp-block-button__link:hover {box-shadow: var(--secondarybtnhovershadow, none);}' );
+		}
 	}
 
 	/**
@@ -292,6 +312,17 @@ class Front_End {
 			wp_style_add_data( 'neve-woocommerce', 'rtl', 'replace' );
 			wp_style_add_data( 'neve-woocommerce', 'suffix', '.min' );
 			wp_enqueue_style( 'neve-woocommerce' );
+		}
+
+		if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+
+			$style_path = 'css/easy-digital-downloads';
+
+			wp_register_style( 'neve-easy-digital-downloads', NEVE_ASSETS_URL . $style_path . ( ( NEVE_DEBUG ) ? '' : '.min' ) . '.css', array(), apply_filters( 'neve_version_filter', NEVE_VERSION ) );
+			wp_style_add_data( 'neve-easy-digital-downloads', 'rtl', 'replace' );
+			wp_style_add_data( 'neve-easy-digital-downloads', 'suffix', '.min' );
+			wp_enqueue_style( 'neve-easy-digital-downloads' );
+
 		}
 
 		$style_path = neve_is_new_skin() ? '/style-main-new' : '/assets/css/style-legacy';
@@ -344,8 +375,7 @@ class Front_End {
 			wp_script_add_data( 'neve-shop-script', 'async', true );
 		}
 
-
-		if ( is_singular() ) {
+		if ( is_singular() & comments_open() && get_option( 'thread_comments' ) ) {
 			wp_enqueue_script( 'comment-reply' );
 		}
 	}
@@ -396,6 +426,8 @@ class Front_End {
 			'add_item'          => __( 'Add item', 'neve' ),
 			'add_items'         => __( 'Add items by clicking the ones below.', 'neve' ),
 			'all_selected'      => __( 'All items are already selected.', 'neve' ),
+			'page_layout'       => __( 'Page Layout', 'neve' ),
+			'page_title'        => __( 'Page Title', 'neve' ),
 			'upsell_components' => __( 'Upgrade to Neve Pro and unlock all components, including Wish List, Breadcrumbs, Custom Layouts and many more.', 'neve' ),
 			'header_booster'    => esc_html__( 'Header Booster', 'neve' ),
 			'blog_booster'      => esc_html__( 'Blog Booster', 'neve' ),

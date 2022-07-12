@@ -101,7 +101,7 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar'      => [
 							'selector' => 'body',
-							'vars'     => '--formFieldPadding',
+							'vars'     => '--formfieldpadding',
 							'suffix'   => 'px',
 						],
 						'responsive'  => false,
@@ -148,11 +148,14 @@ class Form_Fields extends Base_Customizer {
 					'section'               => $this->section_id,
 					'priority'              => 17,
 					'default'               => 'var(--nv-site-bg)',
+					'input_attrs'           => [
+						'allow_gradient' => true,
+					],
 					'live_refresh_selector' => true,
 					'live_refresh_css_prop' => [
 						'cssVar'   => [
 							'selector' => 'body',
-							'vars'     => '--formFieldBgColor',
+							'vars'     => '--formfieldbgcolor',
 						],
 						'template' => '
 							body form input:read-write,
@@ -195,7 +198,7 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar'      => [
 							'selector' => 'body',
-							'vars'     => '--formFieldBorderWidth',
+							'vars'     => '--formfieldborderwidth',
 							'suffix'   => 'px',
 						],
 						'responsive'  => false,
@@ -254,7 +257,7 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar'      => [
 							'selector' => 'body',
-							'vars'     => '--formFieldBorderRadius',
+							'vars'     => '--formfieldborderradius',
 							'suffix'   => 'px',
 						],
 						'responsive'  => false,
@@ -300,7 +303,7 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar'   => [
 							'selector' => 'body',
-							'vars'     => '--formFieldBorderColor',
+							'vars'     => '--formfieldbordercolor',
 						],
 						'template' => '
 							body form input:read-write,
@@ -364,7 +367,7 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar'   => [
 							'selector' => 'body',
-							'vars'     => '--formFieldColor',
+							'vars'     => '--formfieldcolor',
 						],
 						'template' => '
 							body form input:read-write,
@@ -441,17 +444,17 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar' => [
 							'vars'     => [
-								'--formFieldTextTransform' => 'textTransform',
-								'--formFieldFontWeight'    => 'fontWeight',
-								'--formFieldFontSize'      => [
+								'--formfieldtexttransform' => 'textTransform',
+								'--formfieldfontweight'    => 'fontWeight',
+								'--formfieldfontsize'      => [
 									'key'        => 'fontSize',
 									'responsive' => true,
 								],
-								'--formFieldLineHeight'    => [
+								'--formfieldlineheight'    => [
 									'key'        => 'lineHeight',
 									'responsive' => true,
 								],
-								'--formFieldLetterSpacing' => [
+								'--formfieldletterspacing' => [
 									'key'        => 'letterSpacing',
 									'suffix'     => 'px',
 									'responsive' => true,
@@ -530,17 +533,17 @@ class Form_Fields extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar' => [
 							'vars'     => [
-								'--formLabelTextTransform' => 'textTransform',
-								'--formLabelFontWeight'    => 'fontWeight',
-								'--formLabelFontSize'      => [
+								'--formlabeltexttransform' => 'textTransform',
+								'--formlabelfontweight'    => 'fontWeight',
+								'--formlabelfontsize'      => [
 									'key'        => 'fontSize',
 									'responsive' => true,
 								],
-								'--formLabelLineHeight'    => [
+								'--formlabellineheight'    => [
 									'key'        => 'lineHeight',
 									'responsive' => true,
 								],
-								'--formLabelLetterSpacing' => [
+								'--formlabelletterspacing' => [
 									'key'        => 'letterSpacing',
 									'suffix'     => 'px',
 									'responsive' => true,

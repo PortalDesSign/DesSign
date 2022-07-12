@@ -28,6 +28,7 @@ class CartIcon extends Abstract_Component {
 	const COLOR_ID        = 'color';
 	const HOVER_COLOR_ID  = 'hover_color';
 	const ICON_SELECTOR   = 'icon_selector';
+	const ICON_CUSTOM     = 'icon_selector_custom';
 	const CART_LABEL      = 'cart_label';
 	const CART_FOCUS      = 'cart_focus';
 	const MINI_CART_STYLE = 'mini_cart_style';
@@ -154,7 +155,7 @@ class CartIcon extends Abstract_Component {
 				'live_refresh_selector' => $this->default_selector . ' span.nv-icon.nv-cart svg',
 				'live_refresh_css_prop' => [
 					'cssVar'  => [
-						'vars'     => '--iconSize',
+						'vars'     => '--iconsize',
 						'selector' => '.builder-item--' . $this->get_id(),
 						'suffix'   => 'px',
 					],
@@ -209,7 +210,7 @@ class CartIcon extends Abstract_Component {
 				'live_refresh_selector' => true,
 				'live_refresh_css_prop' => [
 					'cssVar' => [
-						'vars'     => '--hoverColor',
+						'vars'     => '--hovercolor',
 						'selector' => '.builder-item--' . $this->get_id(),
 					],
 					[
@@ -313,12 +314,12 @@ class CartIcon extends Abstract_Component {
 		}
 
 		$rules = [
-			'--iconSize'   => [
+			'--iconsize'   => [
 				Dynamic_Selector::META_KEY     => $this->get_id() . '_' . self::SIZE_ID,
 				Dynamic_Selector::META_SUFFIX  => 'px',
 				Dynamic_Selector::META_DEFAULT => SettingsManager::get_instance()->get_default( $this->get_id() . '_' . self::SIZE_ID ),
 			],
-			'--labelSize'  => [
+			'--labelsize'  => [
 				Dynamic_Selector::META_KEY     => $this->get_id() . '_' . self::LABEL_SIZE_ID,
 				Dynamic_Selector::META_SUFFIX  => 'px',
 				Dynamic_Selector::META_DEFAULT => 15,
@@ -327,7 +328,7 @@ class CartIcon extends Abstract_Component {
 				Dynamic_Selector::META_KEY     => $this->get_id() . '_' . self::COLOR_ID,
 				Dynamic_Selector::META_DEFAULT => SettingsManager::get_instance()->get_default( $this->get_id() . '_' . self::COLOR_ID ),
 			],
-			'--hoverColor' => [
+			'--hovercolor' => [
 				Dynamic_Selector::META_KEY     => $this->get_id() . '_' . self::HOVER_COLOR_ID,
 				Dynamic_Selector::META_DEFAULT => SettingsManager::get_instance()->get_default( $this->get_id() . '_' . self::HOVER_COLOR_ID ),
 			],

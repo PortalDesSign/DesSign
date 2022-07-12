@@ -43,6 +43,7 @@ class Main {
 	 */
 	private $useful_plugins = [
 		'optimole-wp',
+		'wp-landing-kit',
 		'wp-cloudflare-page-cache',
 		'templates-patterns-collection',
 		'themeisle-companion',
@@ -229,7 +230,7 @@ class Main {
 				'licenseCardDescription'        => sprintf(
 				// translators: store name (Themeisle)
 					__( 'Enter your license from %1$s purchase history in order to get plugin updates', 'neve' ),
-					'<a target="_blank" rel="external noreferrer noopener" href="https://store.themeisle.com/">ThemeIsle<span class="components-visually-hidden">' . esc_html__( '(opens in a new tab)', 'neve' ) . '</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="components-external-link__icon css-6wogo1-StyledIcon etxm6pv0" role="img" aria-hidden="true" focusable="false"><path d="M18.2 17c0 .7-.6 1.2-1.2 1.2H7c-.7 0-1.2-.6-1.2-1.2V7c0-.7.6-1.2 1.2-1.2h3.2V4.2H7C5.5 4.2 4.2 5.5 4.2 7v10c0 1.5 1.2 2.8 2.8 2.8h10c1.5 0 2.8-1.2 2.8-2.8v-3.6h-1.5V17zM14.9 3v1.5h3.7l-6.4 6.4 1.1 1.1 6.4-6.4v3.7h1.5V3h-6.3z"></path></svg></a>'
+					'<a target="_blank" rel="external noreferrer noopener" href="https://store.themeisle.com/">ThemeIsle<span class="components-visually-hidden">' . esc_html__( '(opens in a new tab)', 'neve' ) . '</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" class="components-external-link__icon" role="img" aria-hidden="true" focusable="false" style="fill: #0073AA"><path d="M18.2 17c0 .7-.6 1.2-1.2 1.2H7c-.7 0-1.2-.6-1.2-1.2V7c0-.7.6-1.2 1.2-1.2h3.2V4.2H7C5.5 4.2 4.2 5.5 4.2 7v10c0 1.5 1.2 2.8 2.8 2.8h10c1.5 0 2.8-1.2 2.8-2.8v-3.6h-1.5V17zM14.9 3v1.5h3.7l-6.4 6.4 1.1 1.1 6.4-6.4v3.7h1.5V3h-6.3z"></path></svg></a>'
 				),
 			],
 			'changelog'               => $this->cl_handler->get_changelog( get_template_directory() . '/CHANGELOG.md' ),
@@ -238,10 +239,16 @@ class Main {
 			'hidePluginsTab'          => apply_filters( 'neve_hide_useful_plugins', ! array_key_exists( 'useful_plugins', $old_about_config ) ),
 			'tpcPath'                 => defined( 'TIOB_PATH' ) ? TIOB_PATH . 'template-patterns-collection.php' : 'template-patterns-collection/template-patterns-collection.php',
 			'tpcAdminURL'             => admin_url( 'themes.php?page=tiob-starter-sites' ),
+			'pluginsURL'              => esc_url( admin_url( 'plugins.php' ) ),
 		];
 
 		if ( defined( 'NEVE_PRO_PATH' ) ) {
-			$data['changelogPro'] = $this->cl_handler->get_changelog( NEVE_PRO_PATH . '/CHANGELOG.md' );
+			$installed_plugins                     = get_plugins();
+			$is_otter_installed                    = array_key_exists( 'otter-pro/otter-pro.php', $installed_plugins );
+			$is_sparks_installed                   = array_key_exists( 'sparks-for-woocommerce/sparks-for-woocommerce.php', $installed_plugins );
+			$data['changelogPro']                  = $this->cl_handler->get_changelog( NEVE_PRO_PATH . '/CHANGELOG.md' );
+			$data['otterProInstall']               = $is_otter_installed ? esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=otter-pro%2Fotter-pro.php&plugin_status=all&paged=1&s' ), 'activate-plugin_otter-pro/otter-pro.php' ) ) : esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=install_otter_pro' ), 'install_otter_pro' ) );
+			$data['sparksInstallActivateEndpoint'] = $is_sparks_installed ? esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=sparks-for-woocommerce%2Fsparks-for-woocommerce.php&plugin_status=all&paged=1&s' ), 'activate-plugin_sparks-for-woocommerce/sparks-for-woocommerce.php' ) ) : esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=install_sparks' ), 'install_sparks' ) );
 		}
 
 		if ( isset( $_GET['onboarding'] ) && $_GET['onboarding'] === 'yes' ) {
@@ -300,6 +307,19 @@ class Main {
 			}
 		}
 
+		if ( $this->show_branding_notice() ) {
+			$notifications['branding-discount'] = [
+				'text'        => sprintf(
+				// translators: s - Discount Code
+					__( 'From 3.3.0 we decided to remove the copyright component from the free version. You can continue using it if you rollback to 3.2.x or you can upgrade to pro, using a one time 50%% discount: %s', 'neve' ),
+					wp_kses_post( '<code>NEVEBRANDING50</code>' )
+				),
+				'url'         => 'https://themeisle.com/themes/neve/upgrade/?utm_medium=aboutneve&utm_source=copyrightnotice&utm_campaign=neve',
+				'targetBlank' => true,
+				'cta'         => __( 'Upgrade', 'neve' ),
+			];
+		}
+
 		if ( count( $notifications ) === 1 && is_plugin_active( $plugin_path ) ) {
 			foreach ( $notifications as $key => $notification ) {
 				/* translators: 1 - Theme Name (Neve), 2 - Plugin Name (Neve Pro) */
@@ -307,7 +327,23 @@ class Main {
 			}
 		}
 
+		$notifications = apply_filters( 'neve_dashboard_notifications', $notifications );
+
 		return $notifications;
+	}
+
+
+	/**
+	 * Should branding notice be shown.
+	 *
+	 * @return bool
+	 */
+	private function show_branding_notice() {
+		if ( $this->has_valid_addons() ) {
+			return false;
+		}
+
+		return time() < strtotime( '2022-07-06' );
 	}
 
 	/**
@@ -470,11 +506,11 @@ class Main {
 		if ( $available !== false && $hash === $current_hash ) {
 			$available = json_decode( $available, true );
 			foreach ( $available as $slug => $args ) {
-				$available[ $slug ]['cta']        = $this->plugin_helper->get_plugin_state( $slug );
+				$available[ $slug ]['cta']        = ( $args['cta'] === 'external' ) ? 'external' : $this->plugin_helper->get_plugin_state( $slug );
 				$available[ $slug ]['path']       = $this->plugin_helper->get_plugin_path( $slug );
 				$available[ $slug ]['activate']   = $this->plugin_helper->get_plugin_action_link( $slug );
 				$available[ $slug ]['deactivate'] = $this->plugin_helper->get_plugin_action_link( $slug, 'deactivate' );
-				$available[ $slug ]['version']    = $this->plugin_helper->get_plugin_version( $slug, $available[ $slug ]['version'] );
+				$available[ $slug ]['version']    = ! empty( $available[ $slug ]['version'] ) ? $this->plugin_helper->get_plugin_version( $slug, $available[ $slug ]['version'] ) : '';
 			}
 
 			return $available;
@@ -482,6 +518,12 @@ class Main {
 
 		$data = [];
 		foreach ( $this->useful_plugins as $slug ) {
+
+			if ( array_key_exists( $slug, $this->get_external_plugins_data() ) ) {
+				$data[ $slug ] = $this->get_external_plugins_data()[ $slug ];
+				continue;
+			}
+
 			$current_plugin = $this->plugin_helper->get_plugin_details( $slug );
 			if ( $current_plugin instanceof \WP_Error ) {
 				continue;
@@ -518,6 +560,29 @@ class Main {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Get data of external plugins that are not hosted on wp.org.
+	 *
+	 * @return array
+	 */
+	private function get_external_plugins_data() {
+
+		$plugins = array(
+			'wp-landing-kit' => array(
+				'banner'      => NEVE_ASSETS_URL . 'img/dashboard/wp-landing.jpg',
+				'name'        => 'WP Landing Kit',
+				'description' => 'Turn WordPress into a landing page powerhouse with Landing Kit. Map domains to pages or any other published resource.',
+				'author'      => 'Themeisle',
+				'cta'         => 'external',
+				'url'         => 'https://wplandingkit.com/?utm_medium=nevedashboard&utm_source=recommendedplugins&utm_campaign=neve',
+				'premium'     => true,
+			),
+
+		);
+
+		return $plugins;
 	}
 
 }

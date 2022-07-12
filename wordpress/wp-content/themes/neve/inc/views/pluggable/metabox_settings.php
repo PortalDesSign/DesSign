@@ -151,6 +151,16 @@ class Metabox_Settings {
 			return (int) get_option( 'page_for_posts' );
 		}
 
+		// On shop page the returning id is the id of the first product. We need the id of the page.
+		// is_archive is true for shop page, so we need to check shop before is_archive
+		if ( class_exists( 'WooCommerce' ) && is_shop() ) {
+			return wc_get_page_id( 'shop' );
+		}
+
+		if ( is_archive() ) {
+			return false;
+		}
+
 		if ( is_search() ) {
 			return false;
 		}
@@ -159,10 +169,6 @@ class Metabox_Settings {
 			return false;
 		}
 
-		// On shop page the returning id is the id of the first product. We need the id of the page.
-		if ( class_exists( 'WooCommerce' ) && is_shop() ) {
-			return wc_get_page_id( 'shop' );
-		}
 
 		global $post;
 		if ( empty( $post ) ) {
@@ -182,6 +188,7 @@ class Metabox_Settings {
 	 * Set editor width.
 	 */
 	public function editor_content_width() {
+		global $post_type;
 		$meta_value = $this->get_content_width();
 		$container  = $this->get_current_layout();
 
@@ -191,7 +198,8 @@ class Metabox_Settings {
 			$editor_width = Mods::get( Config::MODS_CONTAINER_WIDTH );
 			$editor_width = isset( $editor_width['desktop'] ) ? (int) $editor_width['desktop'] : 1170;
 			if ( empty( $meta_value ) ) {
-				$meta_value = $this->get_content_width_default();
+				$meta_key   = $post_type === 'post' ? Config::MODS_SINGLE_CONTENT_WIDTH : Config::MODS_OTHERS_CONTENT_WIDTH;
+				$meta_value = Mods::get( $meta_key, $this->get_content_width_default() );
 			}
 			$editor_width_normal = round( ( $meta_value / 100 ) * $editor_width ) . 'px';
 		} else {
@@ -220,6 +228,7 @@ class Metabox_Settings {
 			$editor_width_normal
 		);
 
+		$style = $this->add_button_shadow_styles( $style );
 
 		wp_add_inline_style( 'neve-gutenberg-style', $style );
 
@@ -360,12 +369,32 @@ class Metabox_Settings {
 				max-width: ' . $desktop_value . ';
 			}
 			#content.neve-main > ' . esc_attr( $container_class ) . ' > .row > .col{ max-width: ' . absint( $meta_value ) . '%' . esc_attr( $important ) . '; }
-			#content.neve-main > ' . esc_attr( $container_class ) . ' > .row > .nv-sidebar-wrap,
-			#content.neve-main > ' . esc_attr( $container_class ) . ' > .row > .nv-sidebar-wrap.shop-sidebar { max-width: ' . absint( $sidebar_width ) . '%' . esc_attr( $important ) . '; }
+			body:not(.neve-off-canvas) #content.neve-main > ' . esc_attr( $container_class ) . ' > .row > .nv-sidebar-wrap,
+			body:not(.neve-off-canvas) #content.neve-main > ' . esc_attr( $container_class ) . ' > .row > .nv-sidebar-wrap.shop-sidebar { max-width: ' . absint( $sidebar_width ) . '%' . esc_attr( $important ) . '; }
 		}
 		';
 
 		wp_add_inline_style( 'neve-style', Dynamic_Css::minify_css( $style ) );
+	}
+
+	/**
+	 * Add button shadow styles if used.
+	 *
+	 * @param string $style Inline styles for the Gutenberg editor.
+	 */
+	private function add_button_shadow_styles( $style ) {
+		$primary_values   = Mods::get( Config::MODS_BUTTON_PRIMARY_STYLE, neve_get_button_appearance_default() );
+		$secondary_values = Mods::get( Config::MODS_BUTTON_SECONDARY_STYLE, neve_get_button_appearance_default( 'secondary' ) );
+		if (
+			( isset( $primary_values['useShadow'] ) && ! empty( $primary_values['useShadow'] ) ) ||
+			( isset( $primary_values['useShadowHover'] ) && ! empty( $primary_values['useShadowHover'] ) ) ||
+			( isset( $secondary_values['useShadow'] ) && ! empty( $secondary_values['useShadow'] ) ) ||
+			( isset( $secondary_values['useShadowHover'] ) && ! empty( $secondary_values['useShadowHover'] ) )
+		) {
+			$style = '.editor-styles-wrapper .wp-block-button.is-style-primary .wp-block-button__link {box-shadow: var(--primarybtnshadow, none);} .editor-styles-wrapper .wp-block-button.is-style-primary .wp-block-button__link:hover {box-shadow: var(--primarybtnhovershadow, none);} .editor-styles-wrapper .wp-block-button.is-style-secondary .wp-block-button__link {box-shadow: var(--secondarybtnshadow, none);} .editor-styles-wrapper .wp-block-button.is-style-secondary .wp-block-button__link:hover {box-shadow: var(--secondarybtnhovershadow, none);}';
+		}
+
+		return $style;
 	}
 
 	/**
@@ -437,22 +466,10 @@ class Metabox_Settings {
 			return $position;
 		}
 
-		$has_content_width = get_post_meta( $post_id, self::ENABLE_CONTENT_WIDTH, true );
+		$meta_value       = get_post_meta( $post_id, self::SIDEBAR, true );
+		$sidebar_position = empty( $meta_value ) || $meta_value === 'default' ? $position : $meta_value;
 
-		if ( $has_content_width === 'on' ) {
-			$content_width = get_post_meta( $post_id, self::CONTENT_WIDTH, true );
-
-			if ( $content_width >= 95 ) {
-				return 'full-width';
-			}
-		}
-
-		$meta_value = get_post_meta( $post_id, self::SIDEBAR, true );
-		if ( empty( $meta_value ) || $meta_value === 'default' ) {
-			return $position;
-		}
-
-		return $meta_value;
+		return $sidebar_position;
 	}
 
 	/**
@@ -544,7 +561,7 @@ class Metabox_Settings {
 			return $style;
 		}
 
-		$style .= '--textAlign:' . esc_attr( $title_meta_alignment ) . ';';
+		$style .= '--textalign:' . esc_attr( $title_meta_alignment ) . ';';
 		if ( $context === 'cover' ) {
 			$justify_map = [
 				'left'   => 'flex-start',

@@ -395,7 +395,7 @@ abstract class Base_Customizer {
 
 			$background_live_refresh_settings = [
 				'cssVar' => array(
-					'vars'     => '--bgColor',
+					'vars'     => '--bgcolor',
 					'selector' => $settings['boxed_selector'],
 				),
 			];
@@ -447,6 +447,9 @@ abstract class Base_Customizer {
 					'label'                 => esc_html__( 'Background color', 'neve' ),
 					'section'               => $settings['section'],
 					'priority'              => $settings['priority'],
+					'input_attrs'           => [
+						'allow_gradient' => true,
+					],
 					'live_refresh_selector' => true,
 					'live_refresh_css_prop' => $background_live_refresh_settings,
 					'active_callback'       => array_key_exists( 'active_callback', $settings ) ? $settings['active_callback'] : false,

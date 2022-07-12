@@ -1,1 +1,1 @@
-<?php return array('dependencies' => array('neve-components', 'wp-api', 'wp-components', 'wp-compose', 'wp-data', 'wp-element', 'wp-i18n'), 'version' => 'f32416a57417cb14b21033a2281d2af2');
+<?php return array('dependencies' => array('neve-components', 'wp-api', 'wp-components', 'wp-compose', 'wp-data', 'wp-element', 'wp-i18n', 'wp-primitives'), 'version' => '5f0cb949152d4d900aa98819f0c72377');

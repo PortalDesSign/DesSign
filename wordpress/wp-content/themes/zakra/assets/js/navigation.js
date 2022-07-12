@@ -123,7 +123,17 @@ window.zakraNavHelper = ZakraNavHelper;
 		(
 			function ( container ) {
 				var touchStartFn, i,
-					parentLink = container.querySelectorAll( '.menu-item-has-children > a, .page_item_has_children > a' );
+					parentLink = container.querySelectorAll( '.menu-item-has-children > a, .page_item_has_children > a' ),
+					supportsPassive = false;;
+				try {
+					var opts = Object.defineProperty( {}, 'passive', {
+						get: function() {
+							supportsPassive = true;
+						}
+					} );
+					window.addEventListener( "testPassive", null, opts );
+					window.removeEventListener( "testPassive", null, opts );
+				} catch (e) {}
 
 				if ( 'ontouchstart' in window ) {
 					touchStartFn = function ( e ) {
@@ -147,7 +157,7 @@ window.zakraNavHelper = ZakraNavHelper;
 					};
 
 					for ( i = 0; i < parentLink.length; ++i ) {
-						parentLink[i].addEventListener( 'touchstart', touchStartFn, false );
+						parentLink[i].addEventListener( 'touchstart', touchStartFn, supportsPassive ? { passive: true } : false );
 					}
 				}
 			}( container )

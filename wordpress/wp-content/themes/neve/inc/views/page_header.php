@@ -31,7 +31,17 @@ class Page_Header extends Base_View {
 	 * @return void
 	 */
 	public function init() {
-		add_action( 'neve_page_header', array( $this, 'render_page_header' ) );
+		add_action( 'wp', [ $this, 'run' ] );
+	}
+
+	/**
+	 * Run the actions for the page header
+	 *
+	 * @return void
+	 */
+	public function run() {
+		$header_hook = get_theme_mod( 'neve_enable_featured_post', false ) && is_home() ? 'neve_do_featured_post' : 'neve_page_header';
+		add_action( $header_hook, array( $this, 'render_page_header' ), 9 );
 		add_filter( 'get_the_archive_title', array( $this, 'filter_archive_title' ) );
 	}
 
@@ -41,16 +51,14 @@ class Page_Header extends Base_View {
 	 * @param string $context the context provided in do_action.
 	 */
 	public function render_page_header( $context ) {
-		if ( apply_filters( 'neve_filter_toggle_content_parts', true, 'title' ) !== true ) {
-			return;
-		}
 		$title_args = $this->get_the_page_title( $context );
+
 		if ( empty( $title_args['string'] ) ) {
 			return;
 		}
 		$header_layout = get_theme_mod( 'neve_page_header_layout', 'normal' );
-		if ( $header_layout !== 'normal' ) {
-			return false;
+		if ( $header_layout !== 'normal' && $context === 'single-page' ) {
+			return;
 		}
 
 		$title_args['category_description'] = $this->get_archive_description();

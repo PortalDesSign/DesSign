@@ -50,11 +50,9 @@ class Layout_Sidebar extends Base_View {
 
 		$class_hide_sidebar_conditionally = '';
 
-		if ( $content_width >= 95 ) {
-			if ( is_customize_preview() ) {
-				// render the sidebar and hide it with CSS
-				$class_hide_sidebar_conditionally = 'hide';
-			} else {
+		if ( $content_width >= 95 && ! $this->shop_sidebar_is_off_canvas() ) {
+			$class_hide_sidebar_conditionally = 'hide';
+			if ( $context !== 'shop' && ! is_customize_preview() ) {
 				// do not load sidebar as SSR
 				return;
 			}
@@ -73,6 +71,8 @@ class Layout_Sidebar extends Base_View {
 			'data_attrs'   => apply_filters( 'neve_sidebar_data_attrs', '', $sidebar_setup['sidebar_slug'] ),
 			'close_button' => $this->get_sidebar_close( $sidebar_setup['sidebar_slug'] ),
 			'slug'         => $sidebar_setup['sidebar_slug'],
+			'context'      => $context,
+			'position'     => $position,
 		);
 
 		$this->get_view( 'sidebar', $args );
@@ -165,6 +165,14 @@ class Layout_Sidebar extends Base_View {
 
 		$sidebar_setup['has_widgets'] = is_active_sidebar( $sidebar_setup['sidebar_slug'] );
 
+		$sidebar_setup = apply_filters( 'neve_sidebar_setup_filter', $sidebar_setup );
+
+		add_filter(
+			'neve_' . $context . '_sidebar_setup',
+			function () use ( $sidebar_setup ) {
+				return $sidebar_setup;
+			}
+		);
 		return $sidebar_setup;
 	}
 

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd5ff812a4153b70b6e0616384d17125f
+class ComposerStaticInit741ec4c73069268485d1adfc2f717c14
 {
     public static $files = array (
         'c730ac5ba4946398dd12db7e8d42d1c8' => __DIR__ . '/..' . '/codeinwp/themeisle-sdk/load.php',
@@ -33,8 +33,8 @@ class ComposerStaticInitd5ff812a4153b70b6e0616384d17125f
         'HFG\\Core\\Components\\Abstract_FooterWidget' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/Abstract_FooterWidget.php',
         'HFG\\Core\\Components\\Button' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/Button.php',
         'HFG\\Core\\Components\\CartIcon' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/CartIcon.php',
-        'HFG\\Core\\Components\\Copyright' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/Copyright.php',
         'HFG\\Core\\Components\\CustomHtml' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/CustomHtml.php',
+        'HFG\\Core\\Components\\EddCartIcon' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/EddCartIcon.php',
         'HFG\\Core\\Components\\FooterWidgetFour' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/FooterWidgetFour.php',
         'HFG\\Core\\Components\\FooterWidgetOne' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/FooterWidgetOne.php',
         'HFG\\Core\\Components\\FooterWidgetThree' => __DIR__ . '/../..' . '/header-footer-grid/Core/Components/FooterWidgetThree.php',
@@ -63,9 +63,9 @@ class ComposerStaticInitd5ff812a4153b70b6e0616384d17125f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd5ff812a4153b70b6e0616384d17125f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd5ff812a4153b70b6e0616384d17125f::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitd5ff812a4153b70b6e0616384d17125f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit741ec4c73069268485d1adfc2f717c14::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit741ec4c73069268485d1adfc2f717c14::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit741ec4c73069268485d1adfc2f717c14::$classMap;
 
         }, null, ClassLoader::class);
     }

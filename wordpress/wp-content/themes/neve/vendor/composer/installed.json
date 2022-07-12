@@ -2,23 +2,23 @@
     "packages": [
         {
             "name": "codeinwp/themeisle-sdk",
-            "version": "3.2.24",
-            "version_normalized": "3.2.24.0",
+            "version": "3.2.26",
+            "version_normalized": "3.2.26.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeinwp/themeisle-sdk.git",
-                "reference": "e5c171e33120fdf8ce6dd3a7bddad984583023f0"
+                "reference": "a4451041bb97a325c7bb8e86a5584adf4636650e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/e5c171e33120fdf8ce6dd3a7bddad984583023f0",
-                "reference": "e5c171e33120fdf8ce6dd3a7bddad984583023f0",
+                "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/a4451041bb97a325c7bb8e86a5584adf4636650e",
+                "reference": "a4451041bb97a325c7bb8e86a5584adf4636650e",
                 "shasum": ""
             },
             "require-dev": {
                 "codeinwp/phpcs-ruleset": "dev-main"
             },
-            "time": "2022-02-09T21:11:37+00:00",
+            "time": "2022-05-12T11:55:06+00:00",
             "type": "library",
             "installation-source": "dist",
             "notification-url": "https://packagist.org/downloads/",
@@ -39,23 +39,23 @@
             ],
             "support": {
                 "issues": "https://github.com/Codeinwp/themeisle-sdk/issues",
-                "source": "https://github.com/Codeinwp/themeisle-sdk/tree/v3.2.24"
+                "source": "https://github.com/Codeinwp/themeisle-sdk/tree/v3.2.26"
             },
             "install-path": "../codeinwp/themeisle-sdk"
         },
         {
             "name": "wptt/webfont-loader",
-            "version": "v1.1.1",
-            "version_normalized": "1.1.1.0",
+            "version": "v1.1.2",
+            "version_normalized": "1.1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WPTT/webfont-loader.git",
-                "reference": "7243420fec7f202a9355485b8533bd99a7654941"
+                "reference": "780e564bf0554c419ef447c2b5b768b497ecee40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WPTT/webfont-loader/zipball/7243420fec7f202a9355485b8533bd99a7654941",
-                "reference": "7243420fec7f202a9355485b8533bd99a7654941",
+                "url": "https://api.github.com/repos/WPTT/webfont-loader/zipball/780e564bf0554c419ef447c2b5b768b497ecee40",
+                "reference": "780e564bf0554c419ef447c2b5b768b497ecee40",
                 "shasum": ""
             },
             "require": {
@@ -67,7 +67,7 @@
                 "php-parallel-lint/php-parallel-lint": "^1.2",
                 "wptrt/wpthemereview": "^0.2.1"
             },
-            "time": "2020-10-03T12:29:50+00:00",
+            "time": "2022-06-17T10:41:00+00:00",
             "type": "package",
             "installation-source": "dist",
             "notification-url": "https://packagist.org/downloads/",

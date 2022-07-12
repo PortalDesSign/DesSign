@@ -270,7 +270,7 @@ abstract class Base_Layout_Single extends Base_Customizer {
 					'live_refresh_css_prop' => [
 						'cssVar' => [
 							'vars'       => [
-								'--textAlign',
+								'--textalign',
 								'--justify',
 							],
 							'valueRemap' => [
@@ -325,7 +325,7 @@ abstract class Base_Layout_Single extends Base_Customizer {
 					'live_refresh_selector' => true,
 					'live_refresh_css_prop' => [
 						'cssVar' => [
-							'vars'       => '--vAlign',
+							'vars'       => '--valign',
 							'responsive' => true,
 							'selector'   => $this->cover_selector,
 						],
@@ -351,10 +351,13 @@ abstract class Base_Layout_Single extends Base_Customizer {
 					'label'                 => esc_html__( 'Overlay color', 'neve' ),
 					'section'               => $this->section,
 					'priority'              => 45,
+					'input_attrs'           => [
+						'allow_gradient' => true,
+					],
 					'live_refresh_selector' => true,
 					'live_refresh_css_prop' => [
 						'cssVar' => array(
-							'vars'     => '--bgColor',
+							'vars'     => '--bgcolor',
 							'selector' => $this->cover_selector . ' .nv-overlay',
 						),
 					],
@@ -471,7 +474,7 @@ abstract class Base_Layout_Single extends Base_Customizer {
 					'live_refresh_selector' => true,
 					'live_refresh_css_prop' => [
 						'cssVar' => [
-							'vars'     => '--blendMode',
+							'vars'     => '--blendmode',
 							'selector' => $this->cover_selector . ' .nv-overlay',
 						],
 					],

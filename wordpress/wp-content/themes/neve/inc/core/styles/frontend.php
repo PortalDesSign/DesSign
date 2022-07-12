@@ -151,9 +151,10 @@ class Frontend extends Generator {
 			];
 		}
 
+		$thumbnail_box_shadow_meta_name                = apply_filters( 'neve_thumbnail_box_shadow_meta_filter', 'neve_post_thumbnail_box_shadow' );
 		$this->_subscribers['.nv-post-thumbnail-wrap'] = [
-			'--boxShadow' => [
-				Dynamic_Selector::META_KEY    => 'neve_post_thumbnail_box_shadow',
+			'--boxshadow' => [
+				Dynamic_Selector::META_KEY    => $thumbnail_box_shadow_meta_name,
 				Dynamic_Selector::META_FILTER => function ( $css_prop, $value, $meta, $device ) {
 					if ( absint( $value ) === 0 ) {
 						return '';
@@ -207,26 +208,26 @@ class Frontend extends Generator {
 		];
 		foreach ( $archive_typography as $selector => $args ) {
 			$this->_subscribers[ $selector ] = [
-				'--fontSize'      => [
+				'--fontsize'      => [
 					Dynamic_Selector::META_KEY           => $args['mod'] . '.fontSize',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 					Dynamic_Selector::META_SUFFIX        => 'px',
 				],
-				'--lineHeight'    => [
+				'--lineheight'    => [
 					Dynamic_Selector::META_KEY           => $args['mod'] . '.lineHeight',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 					Dynamic_Selector::META_SUFFIX        => '',
 				],
-				'--letterSpacing' => [
+				'--letterspacing' => [
 					Dynamic_Selector::META_KEY           => $args['mod'] . '.letterSpacing',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 					Dynamic_Selector::META_SUFFIX        => 'px',
 				],
-				'--fontWeight'    => [
+				'--fontweight'    => [
 					Dynamic_Selector::META_KEY => $args['mod'] . '.fontWeight',
 					'font'                     => 'mods_' . $args['font'],
 				],
-				'--textTransform' => $args['mod'] . '.textTransform',
+				'--texttransform' => $args['mod'] . '.textTransform',
 			];
 		}
 	}
@@ -236,9 +237,8 @@ class Frontend extends Generator {
 	 *
 	 * Removed grid in new skin CSS so this should handle the grid.
 	 *
-	 * @since 3.0.0
-	 *
 	 * @return bool|void
+	 * @since 3.0.0
 	 */
 	public function setup_blog_layout() {
 		if ( ! neve_is_new_skin() ) {
@@ -246,7 +246,7 @@ class Frontend extends Generator {
 		}
 
 		$this->_subscribers[':root'] = [
-			'--postWidth' => [
+			'--postwidth' => [
 				Dynamic_Selector::META_KEY           => 'neve_grid_layout',
 				Dynamic_Selector::META_IS_RESPONSIVE => true,
 				Dynamic_Selector::META_DEFAULT       => $this->grid_columns_default(),
@@ -687,10 +687,13 @@ class Frontend extends Generator {
 			],
 		];
 		// Single content width.
+		list( $context, $allowed_context ) = $this->get_cpt_context( [ 'post' ] );
+		$sidebar_content_width_meta        = $this->get_sidebar_content_width_meta( $context, $allowed_context );
+		$sidebar_layout_width_default      = $this->sidebar_layout_width_default( $sidebar_content_width_meta );
 		$this->_subscribers['.neve-main > .single-post-container .nv-single-post-wrap.col'] = [
 			Config::CSS_PROP_MAX_WIDTH => [
-				Dynamic_Selector::META_KEY         => Config::MODS_SINGLE_CONTENT_WIDTH,
-				Dynamic_Selector::META_DEFAULT     => $this->sidebar_layout_width_default( Config::MODS_SINGLE_CONTENT_WIDTH ),
+				Dynamic_Selector::META_KEY         => $sidebar_content_width_meta,
+				Dynamic_Selector::META_DEFAULT     => $sidebar_layout_width_default,
 				Dynamic_Selector::META_DEVICE_ONLY => Dynamic_Selector::DESKTOP,
 				Dynamic_Selector::META_SUFFIX      => '%',
 			],
@@ -698,8 +701,8 @@ class Frontend extends Generator {
 
 		$this->_subscribers['.single-post-container .alignfull > [class*="__inner-container"], .single-post-container .alignwide > [class*="__inner-container"]']                                 = [
 			Config::CSS_PROP_MAX_WIDTH => [
-				Dynamic_Selector::META_KEY           => Config::MODS_SINGLE_CONTENT_WIDTH,
-				Dynamic_Selector::META_DEFAULT       => $this->sidebar_layout_width_default( Config::MODS_SINGLE_CONTENT_WIDTH ),
+				Dynamic_Selector::META_KEY           => $sidebar_content_width_meta,
+				Dynamic_Selector::META_DEFAULT       => $sidebar_layout_width_default,
 				Dynamic_Selector::META_IS_RESPONSIVE => true,
 				Dynamic_Selector::META_FILTER        => function ( $css_prop, $value, $meta, $device ) {
 					$width = Mods::to_json( Config::MODS_CONTAINER_WIDTH );
@@ -711,8 +714,8 @@ class Frontend extends Generator {
 		];
 		$this->_subscribers['.container-fluid.single-post-container .alignfull > [class*="__inner-container"], .container-fluid.single-post-container .alignwide > [class*="__inner-container"]'] = [
 			Config::CSS_PROP_MAX_WIDTH => [
-				Dynamic_Selector::META_KEY         => Config::MODS_SINGLE_CONTENT_WIDTH,
-				Dynamic_Selector::META_DEFAULT     => $this->sidebar_layout_width_default( Config::MODS_SINGLE_CONTENT_WIDTH ),
+				Dynamic_Selector::META_KEY         => $sidebar_content_width_meta,
+				Dynamic_Selector::META_DEFAULT     => $sidebar_layout_width_default,
 				Dynamic_Selector::META_DEVICE_ONLY => Dynamic_Selector::DESKTOP,
 				Dynamic_Selector::META_FILTER      => function ( $css_prop, $value, $meta, $device ) {
 					return sprintf( 'max-width:calc(%s%% + %spx)', $value, Config::CONTENT_DEFAULT_PADDING / 2 );
@@ -722,8 +725,8 @@ class Frontend extends Generator {
 
 		$this->_subscribers['.neve-main > .single-post-container .nv-sidebar-wrap'] = [
 			Config::CSS_PROP_MAX_WIDTH => [
-				Dynamic_Selector::META_KEY         => Config::MODS_SINGLE_CONTENT_WIDTH,
-				Dynamic_Selector::META_DEFAULT     => $this->sidebar_layout_width_default( Config::MODS_SINGLE_CONTENT_WIDTH ),
+				Dynamic_Selector::META_KEY         => $sidebar_content_width_meta,
+				Dynamic_Selector::META_DEFAULT     => $sidebar_layout_width_default,
 				Dynamic_Selector::META_DEVICE_ONLY => Dynamic_Selector::DESKTOP,
 				Dynamic_Selector::META_FILTER      => 'minus_100',
 				Dynamic_Selector::META_SUFFIX      => '%',
@@ -813,78 +816,78 @@ class Frontend extends Generator {
 		$this->_subscribers[] = [
 			Dynamic_Selector::KEY_SELECTOR => ':root',
 			Dynamic_Selector::KEY_RULES    => [
-				'--formFieldBorderWidth'   => [
+				'--formfieldborderwidth'   => [
 					Dynamic_Selector::META_KEY     => Config::MODS_FORM_FIELDS_BORDER_WIDTH,
 					Dynamic_Selector::META_SUFFIX  => 'px',
 					Dynamic_Selector::META_DEFAULT => $border_width_default,
 					'directional-prop'             => Config::CSS_PROP_BORDER_WIDTH,
 				],
-				'--formFieldBorderRadius'  => [
+				'--formfieldborderradius'  => [
 					Dynamic_Selector::META_KEY     => Config::MODS_FORM_FIELDS_BORDER_RADIUS,
 					Dynamic_Selector::META_SUFFIX  => 'px',
 					Dynamic_Selector::META_DEFAULT => $border_radius_default,
 					'directional-prop'             => Config::CSS_PROP_BORDER_RADIUS,
 				],
-				'--formFieldBgColor'       => [
+				'--formfieldbgcolor'       => [
 					Dynamic_Selector::META_KEY     => Config::MODS_FORM_FIELDS_BACKGROUND_COLOR,
 					Dynamic_Selector::META_DEFAULT => 'var(--nv-site-bg)',
 				],
-				'--formFieldBorderColor'   => [
+				'--formfieldbordercolor'   => [
 					Dynamic_Selector::META_KEY     => Config::MODS_FORM_FIELDS_BORDER_COLOR,
 					Dynamic_Selector::META_DEFAULT => '#dddddd',
 				],
-				'--formFieldColor'         => [
+				'--formfieldcolor'         => [
 					Dynamic_Selector::META_KEY     => Config::MODS_FORM_FIELDS_COLOR,
 					Dynamic_Selector::META_DEFAULT => 'var(--nv-text-color)',
 				],
-				'--formFieldPadding'       => [
+				'--formfieldpadding'       => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_PADDING,
 					Dynamic_Selector::META_DEFAULT       => Mods::get_alternative_mod_default( Config::MODS_FORM_FIELDS_PADDING ),
 					Dynamic_Selector::META_SUFFIX        => 'px',
 					Dynamic_Selector::META_IS_RESPONSIVE => false,
 					'directional-prop'                   => Config::CSS_PROP_PADDING,
 				],
-				'--formFieldTextTransform' => [
+				'--formfieldtexttransform' => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_TYPEFACE . '.textTransform',
 					Dynamic_Selector::META_IS_RESPONSIVE => false,
 				],
-				'--formFieldFontSize'      => [
+				'--formfieldfontsize'      => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_TYPEFACE . '.fontSize',
 					Dynamic_Selector::META_SUFFIX        => 'px',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 				],
-				'--formFieldLineHeight'    => [
+				'--formfieldlineheight'    => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_TYPEFACE . '.lineHeight',
 					Dynamic_Selector::META_SUFFIX        => '',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 				],
-				'--formFieldLetterSpacing' => [
+				'--formfieldletterspacing' => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_TYPEFACE . '.letterSpacing',
 					Dynamic_Selector::META_SUFFIX        => 'px',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 				],
-				'--formFieldFontWeight'    => [
+				'--formfieldfontweight'    => [
 					Dynamic_Selector::META_KEY => Config::MODS_FORM_FIELDS_TYPEFACE . '.fontWeight',
 				],
 				// Form Labels
-				'--formLabelFontSize'      => [
+				'--formlabelfontsize'      => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_LABELS_TYPEFACE . '.fontSize',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 					Dynamic_Selector::META_SUFFIX        => 'px',
 				],
-				'--formLabelLineHeight'    => [
+				'--formlabellineheight'    => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_LABELS_TYPEFACE . '.lineHeight',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 					Dynamic_Selector::META_SUFFIX        => '',
 				],
-				'--formLabelLetterSpacing' => [
+				'--formlabelletterspacing' => [
 					Dynamic_Selector::META_KEY           => Config::MODS_FORM_FIELDS_LABELS_TYPEFACE . '.letterSpacing',
 					Dynamic_Selector::META_IS_RESPONSIVE => true,
 				],
-				'--formLabelFontWeight'    => [
+				'--formlabelfontweight'    => [
 					Dynamic_Selector::META_KEY => Config::MODS_FORM_FIELDS_LABELS_TYPEFACE . '.fontWeight',
 				],
-				'--formLabelTextTransform' => [
+				'--formlabeltexttransform' => [
 					Dynamic_Selector::META_KEY => Config::MODS_FORM_FIELDS_LABELS_TYPEFACE . '.textTransform',
 				],
 			],
@@ -899,27 +902,27 @@ class Frontend extends Generator {
 
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON ]['background-color']       = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnBg, transparent)',
+			'override' => 'var(--secondarybtnbg, transparent)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON ]['color']                  = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnColor)',
+			'override' => 'var(--secondarybtncolor)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON ]['padding']                = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnPadding, 7px 12px)',
+			'override' => 'var(--secondarybtnpadding, 7px 12px)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON ]['border-radius']          = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnBorderRadius, 3px)',
+			'override' => 'var(--secondarybtnborderradius, 3px)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON_HOVER ]['background-color'] = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnHoverBg, transparent)',
+			'override' => 'var(--secondarybtnhoverbg, transparent)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON_HOVER ]['color']            = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnHoverColor)',
+			'override' => 'var(--secondarybtnhovercolor)',
 		];
 
 		$mod_key_secondary = Config::MODS_BUTTON_SECONDARY_STYLE;
@@ -932,15 +935,15 @@ class Frontend extends Generator {
 
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON ]['border-width']       = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnBorderWidth, 3px)',
+			'override' => 'var(--secondarybtnborderwidth, 3px)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON ]['border-color']       = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnHoverColor)',
+			'override' => 'var(--secondarybtnhovercolor)',
 		];
 		$this->_subscribers[ Config::CSS_SELECTOR_FORM_BUTTON_HOVER ]['border-color'] = [
 			'key'      => 'neve_form_button_type',
-			'override' => 'var(--secondaryBtnHoverColor)',
+			'override' => 'var(--secondarybtnhovercolor)',
 		];
 	}
 
@@ -972,13 +975,20 @@ class Frontend extends Generator {
 	public function setup_blog_meta() {
 		if ( ! neve_is_new_skin() ) {
 			$this->setup_blog_meta_legacy();
-
 			return;
 		}
 
+		list( $context, $allowed_context ) = $this->get_cpt_context();
+		$archive_avatar_size_meta_key      = Config::MODS_ARCHIVE_POST_META_AUTHOR_AVATAR_SIZE;
+		$single_avatar_size_meta_key       = Config::MODS_SINGLE_POST_META_AUTHOR_AVATAR_SIZE;
+		if ( in_array( $context, $allowed_context, true ) && neve_is_new_skin() && is_singular( $context ) || is_post_type_archive( $context ) ) {
+			$archive_avatar_size_meta_key = 'neve_' . $context . '_archive_author_avatar_size';
+			$single_avatar_size_meta_key  = 'neve_single_' . $context . '_avatar_size';
+		}
+
 		$rules = [
-			'--avatarSize' => [
-				Dynamic_Selector::META_KEY           => Config::MODS_ARCHIVE_POST_META_AUTHOR_AVATAR_SIZE,
+			'--avatarsize' => [
+				Dynamic_Selector::META_KEY           => $archive_avatar_size_meta_key,
 				Dynamic_Selector::META_IS_RESPONSIVE => true,
 				Dynamic_Selector::META_SUFFIX        => 'px',
 				Dynamic_Selector::META_DEFAULT       => '{ "mobile": 20, "tablet": 20, "desktop": 20 }',
@@ -986,8 +996,8 @@ class Frontend extends Generator {
 		];
 
 		$rules_single = [
-			'--avatarSize' => [
-				Dynamic_Selector::META_KEY           => Config::MODS_SINGLE_POST_META_AUTHOR_AVATAR_SIZE,
+			'--avatarsize' => [
+				Dynamic_Selector::META_KEY           => $single_avatar_size_meta_key,
 				Dynamic_Selector::META_IS_RESPONSIVE => true,
 				Dynamic_Selector::META_SUFFIX        => 'px',
 				Dynamic_Selector::META_DEFAULT       => Mods::get( 'neve_author_avatar_size', '{ "mobile": 20, "tablet": 20, "desktop": 20 }' ),
@@ -1148,7 +1158,7 @@ class Frontend extends Generator {
 				Dynamic_Selector::META_DEFAULT       => $this->padding_default(),
 				'directional-prop'                   => Config::CSS_PROP_PADDING,
 			],
-			'--bgColor' => [
+			'--bgcolor' => [
 				Dynamic_Selector::META_KEY => Config::MODS_POST_COMMENTS_BACKGROUND_COLOR,
 			],
 			'--color'   => [
@@ -1168,7 +1178,7 @@ class Frontend extends Generator {
 				Dynamic_Selector::META_DEFAULT       => $this->padding_default(),
 				'directional-prop'                   => Config::CSS_PROP_PADDING,
 			],
-			'--bgColor' => [
+			'--bgcolor' => [
 				Dynamic_Selector::META_KEY => Config::MODS_POST_COMMENTS_FORM_BACKGROUND_COLOR,
 			],
 			'--color'   => [
@@ -1195,17 +1205,37 @@ class Frontend extends Generator {
 		];
 	}
 
-
+	/**
+	 * Check that all mods passed can be used for the provided context.
+	 * We use this to check if we can register subscribers for the provided mods.
+	 *
+	 * @since 3.1.0
+	 *
+	 * @param string[] $mods               A list of mods.
+	 * @param string   $context            A context for the mods.
+	 * @param array    $allowed_context    A list of allowed contexts to be passed on.
+	 *
+	 * @return int
+	 */
+	private function can_use_mods( $mods, $context, $allowed_context ) {
+		return array_reduce(
+			$mods,
+			function ( $carry, $item ) use ( $context, $allowed_context ) {
+				if ( empty( $this->get_cover_meta( $context, $item, $allowed_context ) ) ) {
+					return 0;
+				}
+				return $carry;
+			},
+			1
+		);
+	}
 
 	/**
 	 * Add css for post/page header.
 	 */
 	private function setup_header_style() {
 
-		$context = $this->get_header_context();
-		if ( empty( $context ) ) {
-			return;
-		}
+		list( $context, $allowed_context ) = $this->get_cpt_context();
 
 		$justify_map = [
 			'left'   => 'flex-start',
@@ -1213,101 +1243,131 @@ class Frontend extends Generator {
 			'right'  => 'flex-end',
 		];
 
-		$cover_rules = [
-			'--height'    => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_HEIGHT' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_AS_JSON       => true,
-				Dynamic_Selector::META_SUFFIX        => 'responsive_suffix',
-				Dynamic_Selector::META_DEFAULT       => '{ "mobile": "250", "tablet": "320", "desktop": "400" }',
+		$can_use_cover_rules = $this->can_use_mods(
+			[
+				Config::MODS_COVER_HEIGHT,
+				Config::MODS_COVER_PADDING,
+				Config::MODS_COVER_TITLE_ALIGNMENT,
+				Config::MODS_COVER_TITLE_POSITION,
 			],
-			'--padding'   => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_PADDING' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_DEFAULT       => $this->padding_default( 'cover' ),
-				'directional-prop'                   => Config::CSS_PROP_PADDING,
-			],
-			'--justify'   => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_TITLE_ALIGNMENT' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_DEFAULT       => self::post_title_alignment(),
-				Dynamic_Selector::META_FILTER        => function ( $css_prop, $value, $meta, $device ) use ( $justify_map ) {
-					return sprintf( '%s: %s;', $css_prop, $justify_map[ $value ] );
-				},
-			],
-			'--textAlign' => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_TITLE_ALIGNMENT' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_DEFAULT       => self::post_title_alignment(),
-			],
-			'--vAlign'    => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_TITLE_POSITION' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_DEFAULT       => [
-					'mobile'  => 'center',
-					'tablet'  => 'center',
-					'desktop' => 'center',
+			$context,
+			$allowed_context
+		);
+		if ( $can_use_cover_rules ) {
+			$cover_rules          = [
+				'--height'    => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_HEIGHT, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_AS_JSON       => true,
+					Dynamic_Selector::META_SUFFIX        => 'responsive_suffix',
+					Dynamic_Selector::META_DEFAULT       => '{ "mobile": "250", "tablet": "320", "desktop": "400" }',
 				],
-			],
-		];
+				'--padding'   => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_PADDING, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_DEFAULT       => $this->padding_default( 'cover' ),
+					'directional-prop'                   => Config::CSS_PROP_PADDING,
+				],
+				'--justify'   => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_TITLE_ALIGNMENT, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_DEFAULT       => self::post_title_alignment(),
+					Dynamic_Selector::META_FILTER        => function ( $css_prop, $value, $meta, $device ) use ( $justify_map ) {
+						return sprintf( '%s: %s;', $css_prop, $justify_map[ $value ] );
+					},
+				],
+				'--textalign' => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_TITLE_ALIGNMENT, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_DEFAULT       => self::post_title_alignment(),
+				],
+				'--valign'    => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_TITLE_POSITION, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_DEFAULT       => [
+						'mobile'  => 'center',
+						'tablet'  => 'center',
+						'desktop' => 'center',
+					],
+				],
+			];
+			$this->_subscribers[] = [
+				'selectors' => '.nv-post-cover',
+				'rules'     => $cover_rules,
+			];
+		}
 
-		$this->_subscribers[] = [
-			'selectors' => '.nv-post-cover',
-			'rules'     => $cover_rules,
-		];
+		$can_use_title_rules = $this->can_use_mods(
+			[ Config::MODS_COVER_TEXT_COLOR, Config::MODS_COVER_TITLE_ALIGNMENT ],
+			$context,
+			$allowed_context
+		);
+		if ( $can_use_title_rules ) {
+			$title_rules          = [
+				'--color'     => [
+					Dynamic_Selector::META_KEY => $this->get_cover_meta( $context, Config::MODS_COVER_TEXT_COLOR, $allowed_context ),
+				],
+				'--textalign' => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_TITLE_ALIGNMENT, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_DEFAULT       => self::post_title_alignment(),
+				],
+			];
+			$this->_subscribers[] = [
+				'selectors' => '.nv-post-cover .nv-title-meta-wrap, .nv-page-title-wrap, .entry-header',
+				'rules'     => $title_rules,
+			];
+		}
 
-		$title_rules = [
-			'--color'     => [
-				Dynamic_Selector::META_KEY => Config::get_constant_value( $context, 'COVER_TEXT_COLOR' ),
-			],
-			'--textAlign' => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_TITLE_ALIGNMENT' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_DEFAULT       => self::post_title_alignment(),
-			],
-		];
+		$can_use_boxed_title_rules = $this->can_use_mods(
+			[ Config::MODS_COVER_BOXED_TITLE_PADDING, Config::MODS_COVER_BOXED_TITLE_BACKGROUND ],
+			$context,
+			$allowed_context
+		);
+		if ( $can_use_boxed_title_rules ) {
+			$boxed_title_rules    = [
+				'--padding' => [
+					Dynamic_Selector::META_KEY           => $this->get_cover_meta( $context, Config::MODS_COVER_BOXED_TITLE_PADDING, $allowed_context ),
+					Dynamic_Selector::META_IS_RESPONSIVE => true,
+					Dynamic_Selector::META_DEFAULT       => $this->padding_default( 'cover' ),
+					'directional-prop'                   => Config::CSS_PROP_PADDING,
+				],
+				'--bgcolor' => [
+					Dynamic_Selector::META_KEY     => $this->get_cover_meta( $context, Config::MODS_COVER_BOXED_TITLE_BACKGROUND, $allowed_context ),
+					Dynamic_Selector::META_DEFAULT => 'var(--nv-dark-bg)',
+				],
+			];
+			$this->_subscribers[] = [
+				'selectors' => '.nv-is-boxed.nv-title-meta-wrap',
+				'rules'     => $boxed_title_rules,
+			];
+		}
 
-		$this->_subscribers[] = [
-			'selectors' => '.nv-post-cover .nv-title-meta-wrap, .nv-page-title-wrap, .entry-header',
-			'rules'     => $title_rules,
-		];
+		$can_use_overlay_rules = $this->can_use_mods(
+			[ Config::MODS_COVER_BACKGROUND_COLOR, Config::MODS_COVER_OVERLAY_OPACITY, Config::MODS_COVER_BLEND_MODE ],
+			$context,
+			$allowed_context
+		);
+		if ( $can_use_overlay_rules ) {
+			$overlay_rules        = [
+				'--bgcolor'   => [
+					Dynamic_Selector::META_KEY => $this->get_cover_meta( $context, Config::MODS_COVER_BACKGROUND_COLOR, $allowed_context ),
+				],
+				'--opacity'   => [
+					Dynamic_Selector::META_KEY     => $this->get_cover_meta( $context, Config::MODS_COVER_OVERLAY_OPACITY, $allowed_context ),
+					Dynamic_Selector::META_DEFAULT => 50,
+				],
+				'--blendmode' => [
+					Dynamic_Selector::META_KEY     => $this->get_cover_meta( $context, Config::MODS_COVER_BLEND_MODE, $allowed_context ),
+					Dynamic_Selector::META_DEFAULT => 'normal',
+				],
+			];
+			$this->_subscribers[] = [
+				'selectors' => '.nv-overlay',
+				'rules'     => $overlay_rules,
+			];
+		}
 
-		$boxed_title_rules = [
-			'--padding' => [
-				Dynamic_Selector::META_KEY           => Config::get_constant_value( $context, 'COVER_BOXED_TITLE_PADDING' ),
-				Dynamic_Selector::META_IS_RESPONSIVE => true,
-				Dynamic_Selector::META_DEFAULT       => $this->padding_default( 'cover' ),
-				'directional-prop'                   => Config::CSS_PROP_PADDING,
-			],
-			'--bgColor' => [
-				Dynamic_Selector::META_KEY     => Config::get_constant_value( $context, 'COVER_BOXED_TITLE_BACKGROUND' ),
-				Dynamic_Selector::META_DEFAULT => 'var(--nv-dark-bg)',
-			],
-		];
-
-		$this->_subscribers[] = [
-			'selectors' => '.nv-is-boxed.nv-title-meta-wrap',
-			'rules'     => $boxed_title_rules,
-		];
-
-		$overlay_rules = [
-			'--bgColor'   => [
-				Dynamic_Selector::META_KEY => Config::get_constant_value( $context, 'COVER_BACKGROUND_COLOR' ),
-			],
-			'--opacity'   => [
-				Dynamic_Selector::META_KEY     => Config::get_constant_value( $context, 'COVER_OVERLAY_OPACITY' ),
-				Dynamic_Selector::META_DEFAULT => 50,
-			],
-			'--blendMode' => [
-				Dynamic_Selector::META_KEY     => Config::get_constant_value( $context, 'COVER_BLEND_MODE' ),
-				Dynamic_Selector::META_DEFAULT => 'normal',
-			],
-		];
-
-		$this->_subscribers[] = [
-			'selectors' => '.nv-overlay',
-			'rules'     => $overlay_rules,
-		];
 	}
 
 	/**

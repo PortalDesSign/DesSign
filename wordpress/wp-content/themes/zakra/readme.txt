@@ -1,11 +1,11 @@
 === Zakra ===
 Contributors: themegrill
 Author: ThemeGrill
-Version: 2.0.4
-Tested up to: 5.8
+Version: 2.1.0
+Tested up to: 6.0
 Requires PHP: 5.6
 Requires at least: 4.7
-Stable tag: 2.0.3
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 Tags: one-column, two-columns, right-sidebar, grid-layout, custom-background, custom-colors, custom-menu, custom-logo, featured-images, footer-widgets, full-width-template, theme-options, threaded-comments, translation-ready, blog, rtl-language-support
@@ -60,6 +60,10 @@ License: GNU GPL, Version 3, https://www.gnu.org/licenses/gpl-3.0.html
 Unless otherwise specified, all the theme files, scripts and images including the screenshot image are licensed under [GNU GPL] (http://www.gnu.org/licenses/gpl-3.0.txt), version 3 or later.
 
 == Changelog ==
+= Version 2.1.0 - 2022-06-09 =
+* Enhancement - Make touch events passive for scrolling performance.
+* Updated     - `Tested up to` header field.
+
 = Version 2.0.9 - 2022-02-22 =
 * Add - Review link section on customizer.
 * Tweak - Add hyphen while mobile menu text breaks.

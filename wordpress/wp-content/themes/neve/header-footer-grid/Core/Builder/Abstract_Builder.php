@@ -21,6 +21,7 @@ use HFG\Core\Settings\Manager as SettingsManager;
 use HFG\Traits\Core;
 use Neve\Core\Settings\Config;
 use Neve\Core\Styles\Dynamic_Selector;
+use Neve\Core\Theme_Info;
 use Neve\Customizer\Controls\React\Instructions_Section;
 use WP_Customize_Manager;
 
@@ -31,6 +32,7 @@ use WP_Customize_Manager;
  */
 abstract class Abstract_Builder implements Builder {
 	use Core;
+	use Theme_Info;
 
 	const LAYOUT_SETTING     = 'layout';
 	const COLUMNS_NUMBER     = 'columns_number';
@@ -407,7 +409,7 @@ abstract class Abstract_Builder implements Builder {
 					'live_refresh_css_prop' => [
 						'cssVar' => [
 							'responsive'           => true,
-							'vars'                 => '--rowBWidth',
+							'vars'                 => '--rowbwidth',
 							'suffix'               => 'px',
 							'fallback'             => '0',
 							'selector'             => '.' . $this->get_id() . '-' . $row_id,
@@ -447,7 +449,7 @@ abstract class Abstract_Builder implements Builder {
 					'live_refresh_selector' => true,
 					'live_refresh_css_prop' => [
 						'cssVar' => [
-							'vars'     => '--rowBColor',
+							'vars'     => '--rowbcolor',
 							'selector' => '.' . $this->get_id() . '-' . $row_id,
 						],
 					],
@@ -469,7 +471,7 @@ abstract class Abstract_Builder implements Builder {
 				'tab'                   => SettingsManager::TAB_STYLE,
 				'section'               => $row_setting_id,
 				'label'                 => __( 'Row Background', 'neve' ),
-				'type'                  => 'neve_background_control',
+				'type'                  => '\Neve\Customizer\Controls\React\Background',
 				'live_refresh_selector' => $row_id === 'sidebar' ? $row_class . ' .header-menu-sidebar-bg' : $row_class,
 				'live_refresh_css_prop' => [
 					'cssVar'  => [
@@ -1151,7 +1153,7 @@ abstract class Abstract_Builder implements Builder {
 				Dynamic_Selector::META_DEFAULT       => '{ desktop: 0, tablet: 0, mobile: 0 }',
 			];
 
-			$rules['--rowBWidth'] = [
+			$rules['--rowbwidth'] = [
 				Dynamic_Selector::META_KEY           => $this->control_id . '_' . $row_index . '_' . self::BOTTOM_BORDER,
 				Dynamic_Selector::META_IS_RESPONSIVE => true,
 				Dynamic_Selector::META_FILTER        => function ( $css_prop, $value, $meta, $device ) {
@@ -1164,7 +1166,7 @@ abstract class Abstract_Builder implements Builder {
 				},
 			];
 
-			$rules['--rowBColor'] = [
+			$rules['--rowbcolor'] = [
 				Dynamic_Selector::META_KEY     => $this->control_id . '_' . $row_index . '_' . self::BORDER_COLOR,
 				Dynamic_Selector::META_DEFAULT => 'var(--nv-light-bg)',
 			];
@@ -1192,7 +1194,7 @@ abstract class Abstract_Builder implements Builder {
 				$rules = array_merge(
 					$rules,
 					[
-						'--bgColor' => [
+						'--bgcolor' => [
 							Dynamic_Selector::META_KEY     => $this->control_id . '_' . $row_index . '_background.colorValue',
 							Dynamic_Selector::META_DEFAULT => $default_color,
 						],
@@ -1204,17 +1206,17 @@ abstract class Abstract_Builder implements Builder {
 				$rules = array_merge(
 					$rules,
 					[
-						'--overlayColor'     => [
+						'--overlaycolor'     => [
 							Dynamic_Selector::META_KEY => $this->control_id . '_' . $row_index . '_background.overlayColorValue',
 						],
-						'--bgImage'          => [
+						'--bgimage'          => [
 							Dynamic_Selector::META_KEY    => $this->control_id . '_' . $row_index . '_background',
 							Dynamic_Selector::META_FILTER => function ( $css_prop, $value, $meta, $device ) {
 								$image = $this->get_row_featured_image( $value['imageUrl'], $value['useFeatured'], $meta );
 								return sprintf( '%s:%s;', $css_prop, $image );
 							},
 						],
-						'--bgPosition'       => [
+						'--bgposition'       => [
 							Dynamic_Selector::META_KEY    => $this->control_id . '_' . $row_index . '_background',
 							Dynamic_Selector::META_FILTER => function ( $css_prop, $value, $meta, $device ) {
 								if ( ! $this->is_valid_focus_point( $value['focusPoint'] ) ) {
@@ -1226,7 +1228,7 @@ abstract class Abstract_Builder implements Builder {
 								return sprintf( '%s:%s;', $css_prop, $parsed_position );
 							},
 						],
-						'--bgAttachment'     => [
+						'--bgattachment'     => [
 							Dynamic_Selector::META_KEY    => $this->control_id . '_' . $row_index . '_background',
 							Dynamic_Selector::META_FILTER => function ( $css_prop, $value, $meta, $device ) {
 								if ( ! isset( $value['fixed'] ) || $value['fixed'] !== true ) {
@@ -1236,7 +1238,7 @@ abstract class Abstract_Builder implements Builder {
 								return sprintf( '%s:fixed;', $css_prop );
 							},
 						],
-						'--bgOverlayOpacity' => [
+						'--bgoverlayopacity' => [
 							Dynamic_Selector::META_KEY    => $this->control_id . '_' . $row_index . '_background',
 							Dynamic_Selector::META_FILTER => function ( $css_prop, $value, $meta, $device ) {
 								if ( ! isset( $value['overlayOpacity'] ) ) {
@@ -1281,12 +1283,21 @@ abstract class Abstract_Builder implements Builder {
 			$row = $device_details[ $row_index ];
 			if ( neve_is_new_builder() ) {
 				$used = [];
+
 				foreach ( $row as $components ) {
 					$used = array_merge( $used, $components );
 				}
 
 				if ( empty( $used ) ) {
-					continue;
+					if ( $this->get_id() !== 'footer' ) {
+						continue;
+					}
+					if ( $row_index !== 'bottom' ) {
+						continue;
+					}
+					if ( $this->has_valid_addons() ) {
+						continue;
+					}
 				}
 			} elseif ( empty( $row ) ) {
 				continue;
@@ -1591,6 +1602,8 @@ abstract class Abstract_Builder implements Builder {
 				}
 				echo '</div>';
 			}
+
+			do_action( 'neve_after_slot_component', $this->get_id(), $row_index, $slot );
 
 			if ( $row_index !== 'sidebar' ) {
 				echo '</div>';
@@ -2002,8 +2015,8 @@ abstract class Abstract_Builder implements Builder {
 					'cssVar' => [
 						'vars'       => [
 							'--justify',
-							'--textAlign',
-							'--flexG',
+							'--textalign',
+							'--flexg',
 						],
 						'valueRemap' => [
 							'--justify' => [
@@ -2011,7 +2024,7 @@ abstract class Abstract_Builder implements Builder {
 								'center' => 'center',
 								'right'  => 'flex-end',
 							],
-							'--flexG'   => [
+							'--flexg'   => [
 								'left'   => '1',
 								'center' => '0',
 								'right'  => '0',
@@ -2177,7 +2190,7 @@ abstract class Abstract_Builder implements Builder {
 				'live_refresh_selector' => true,
 				'live_refresh_css_prop' => [
 					'cssVar' => [
-						'vars'     => '--vAlign',
+						'vars'     => '--valign',
 						'selector' => '.' . $this->get_id() . '-' . $row_id . ' .row',
 					],
 					'is_for' => 'vertical',
@@ -2298,12 +2311,12 @@ abstract class Abstract_Builder implements Builder {
 						},
 						Dynamic_Selector::META_DEFAULT => $align_default,
 					],
-					'--textAlign' => [
+					'--textalign' => [
 						Dynamic_Selector::META_KEY     => $align_id,
 						Dynamic_Selector::META_IS_RESPONSIVE => true,
 						Dynamic_Selector::META_DEFAULT => $align_default,
 					],
-					'--flexG'     => [
+					'--flexg'     => [
 						Dynamic_Selector::META_KEY     => $align_id,
 						Dynamic_Selector::META_IS_RESPONSIVE => true,
 						Dynamic_Selector::META_FILTER  => function ( $css_prop, $value, $meta, $device ) {
@@ -2371,7 +2384,7 @@ abstract class Abstract_Builder implements Builder {
 						return sprintf( '%s:%s;', $css_prop, $proportions );
 					},
 				],
-				'--vAlign'                          => [
+				'--valign'                          => [
 					Dynamic_Selector::META_KEY     => $mods_prefix . self::VERTICAL_ALIGN,
 					Dynamic_Selector::META_DEFAULT => 'flex-start',
 				],

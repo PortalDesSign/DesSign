@@ -18,6 +18,9 @@ $header_components = array(
 if ( class_exists( 'WooCommerce', false ) ) {
 	$header_components[] = 'HFG\Core\Components\CartIcon';
 }
+if ( class_exists( 'Easy_Digital_Downloads', false ) ) {
+	$header_components[] = 'HFG\Core\Components\EddCartIcon';
+}
 
 add_theme_support(
 	'hfg_support',
@@ -30,7 +33,6 @@ add_theme_support(
 				'HFG\Core\Components\FooterWidgetThree',
 				'HFG\Core\Components\FooterWidgetFour',
 				'HFG\Core\Components\NavFooter',
-				'HFG\Core\Components\Copyright',
 			),
 		),
 	)

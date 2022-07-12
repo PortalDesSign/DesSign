@@ -149,6 +149,21 @@ class Magic_Tags {
 			];
 		}
 
+		$edd_magic_tags = array(
+			'edd_cart_total_currency_symbol',
+			'edd_cart_total',
+			'edd_currency_name',
+			'edd_currency_symbol',
+		);
+
+		if ( in_array( $tag, $edd_magic_tags ) ) {
+
+			$allowed_tags['span'] = [
+				'class' => [],
+			];
+
+		}
+
 		return wp_kses( call_user_func( [ $this, $tag ] ), $allowed_tags );
 	}
 
@@ -273,6 +288,30 @@ class Magic_Tags {
 	 */
 	public function site_tagline() {
 		return get_bloginfo( 'description' );
+	}
+
+	/**
+	 * Title for the page currently being viewed.
+	 *
+	 * @return string
+	 */
+	public function current_query_title() {
+		if ( get_option( 'show_on_front' ) === 'page' && is_front_page() ) {
+			return get_the_title();
+		}
+
+		if ( class_exists( 'WooCommerce', false ) ) {
+
+			if ( is_product_category() || is_product_tag() ) {
+				return get_the_archive_title();
+			}
+
+			if ( is_shop() ) {
+				return get_the_title( get_option( 'woocommerce_shop_page_id' ) );
+			}
+		}
+
+		return wp_title( '', false );
 	}
 
 	/**
@@ -452,6 +491,15 @@ class Magic_Tags {
 	}
 
 	/**
+	 * EDD Cart total.
+	 *
+	 * @return string
+	 */
+	public function edd_cart_total() {
+		return '<span class="nv-edd-cart-icon-total-plain nv-edd-cart-total">' . edd_format_amount( (string) edd_get_cart_total() ) . '</span>';
+	}
+
+	/**
 	 * Cart total + currency.
 	 *
 	 * @return string
@@ -460,12 +508,20 @@ class Magic_Tags {
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			return '';
 		}
-
 		return '<span class="nv-cart-icon-total-currency">' . WC()->cart->get_cart_total() . '</span>';
 	}
 
 	/**
-	 * WooCommerce currency.
+	 * EDD Cart total + currency.
+	 *
+	 * @return string
+	 */
+	public function edd_cart_total_currency_symbol() {
+		return '<span class="nv-edd-cart-icon-total-currency nv-edd-cart-total">' . edd_currency_filter( edd_format_amount( (string) edd_get_cart_total() ) ) . '</span>';
+	}
+
+	/**
+	 * WooCommerce currency name.
 	 *
 	 * @return string
 	 */
@@ -475,6 +531,15 @@ class Magic_Tags {
 		}
 
 		return get_woocommerce_currency();
+	}
+
+	/**
+	 * EDD currency name.
+	 *
+	 * @return string
+	 */
+	public function edd_currency_name() {
+		return '<span class="nv-edd-cart-currency-text">' . edd_get_currency() . '</span>';
 	}
 
 	/**
@@ -488,6 +553,15 @@ class Magic_Tags {
 		}
 
 		return '<span class="woocommerce-Price-currencySymbol">' . get_woocommerce_currency_symbol() . '</span>';
+	}
+
+	/**
+	 * EDD currency.
+	 *
+	 * @return string
+	 */
+	public function edd_currency_symbol() {
+		return '<span class="nv-edd-cart-symbol">' . edd_currency_symbol( edd_get_currency() ) . '</span>';
 	}
 
 	/**
@@ -586,19 +660,23 @@ class Magic_Tags {
 			[
 				'label'    => __( 'Global', 'neve' ),
 				'controls' => [
-					'site_title'   => [
+					'site_title'          => [
 						'label' => __( 'Site Title', 'neve' ),
 						'type'  => 'string',
 					],
-					'site_tagline' => [
+					'site_tagline'        => [
 						'label' => __( 'Site Tagline', 'neve' ),
 						'type'  => 'string',
 					],
-					'home_url'     => [
+					'current_query_title' => [
+						'label' => __( 'Current Page Title', 'neve' ),
+						'type'  => 'string',
+					],
+					'home_url'            => [
 						'label' => __( 'Home URL', 'neve' ),
 						'type'  => 'url',
 					],
-					'current_year' => [
+					'current_year'        => [
 						'label' => __( 'Current Year', 'neve' ),
 						'type'  => 'string',
 					],
@@ -626,6 +704,30 @@ class Magic_Tags {
 				],
 			],
 		];
+
+		if ( class_exists( 'Easy_Digital_Downloads', false ) ) {
+			$this->options[] = [
+				'label'    => __( 'EDD Cart', 'neve' ),
+				'controls' => [
+					'edd_cart_total_currency_symbol' => [
+						'label' => __( 'Total + Currency Symbol', 'neve' ),
+						'type'  => 'edd_custom_cart',
+					],
+					'edd_cart_total'                 => [
+						'label' => __( 'Total', 'neve' ),
+						'type'  => 'edd_custom_cart',
+					],
+					'edd_currency_name'              => [
+						'label' => __( 'Currency Name', 'neve' ),
+						'type'  => 'edd_custom_cart',
+					],
+					'edd_currency_symbol'            => [
+						'label' => __( 'Currency Symbol', 'neve' ),
+						'type'  => 'edd_custom_cart',
+					],
+				],
+			];
+		}
 
 		if ( class_exists( 'WooCommerce', false ) ) {
 			$this->options[] = [
